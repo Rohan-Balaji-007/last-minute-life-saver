@@ -1,24 +1,42 @@
-import { useState, useEffect } from 'react'
+import {
+  useState,
+  useEffect
+}
+from 'react'
+
+import {
+  parseTask
+}
+from './services/gemini'
 
 import {
   getTasks,
   addTask
-} from './services/taskService'
+}
+from './services/taskService'
 
 function App() {
 
-  const [task, setTask] =
-    useState('')
+  const [
+    input,
+    setInput
+  ] =
+  useState('')
 
-  const [tasks, setTasks] =
-    useState<any[]>([])
+  const [
+    tasks,
+    setTasks
+  ] =
+  useState<any[]>([])
 
   async function load() {
 
     const data =
       await getTasks()
 
-    setTasks(data || [])
+    setTasks(
+      data || []
+    )
 
   }
 
@@ -28,14 +46,27 @@ function App() {
 
   }, [])
 
-  async function save() {
+  async function run() {
 
-    if (!task.trim())
+    if (
+      !input.trim()
+    )
       return
 
-    await addTask(task)
+    const parsed =
+      await parseTask(
+        input
+      )
 
-    setTask('')
+    console.log(
+      parsed
+    )
+
+    await addTask(
+      parsed
+    )
+
+    setInput('')
 
     await load()
 
@@ -43,133 +74,129 @@ function App() {
 
   return (
 
-    <div
-      style={{
-        padding: '40px',
-        maxWidth: '700px',
-        margin: 'auto'
-      }}
-    >
+<div
+style={{
+padding:'40px',
+maxWidth:'700px',
+margin:'auto'
+}}
+>
 
-      <h1>
-        🚀 Last Minute Life Saver
-      </h1>
+<h1>
 
-      <p>
-        Enter your task below
-      </p>
+🚀 Last Minute Life Saver
 
-      <div
-        style={{
-          display: 'flex',
-          gap: '10px'
-        }}
-      >
+</h1>
 
-        <input
+<br/>
 
-          value={task}
+<input
 
-          placeholder="Example: Submit assignment Friday"
+value={input}
 
-          onChange={
-            e =>
-              setTask(
-                e.target.value
-              )
-          }
+placeholder='Type task...'
 
-          style={{
-            padding: '10px',
-            flex: 1
-          }}
+onChange={
+e=>
+setInput(
+e.target.value
+)
+}
 
-        />
+style={{
+padding:'10px',
+width:'70%'
+}}
 
-        <button
+/>
 
-          onClick={save}
+<button
 
-          style={{
-            padding: '10px 20px'
-          }}
+onClick={run}
 
-        >
+style={{
+marginLeft:'10px',
+padding:'10px'
+}}
 
-          Add Task
+>
 
-        </button>
+Generate
 
-      </div>
+</button>
 
-      <br />
+<br/>
+<br/>
 
-      <h2>
-        Tasks
-      </h2>
+<h2>
 
-      {
+Tasks
 
-        tasks.length === 0
+</h2>
 
-          ?
+{
 
-          <p>
-            No tasks yet
-          </p>
+tasks.map(
 
-          :
+t=>
 
-          tasks.map(
+<div
 
-            t => (
+key={
+t.id
+}
 
-              <div
+style={{
 
-                key={t.id}
+padding:'10px',
 
-                style={{
-                  border: '1px solid #ddd',
-                  padding: '15px',
-                  marginBottom: '12px',
-                  borderRadius: '10px'
-                }}
+border:
+'1px solid gray',
 
-              >
+marginBottom:
+'10px'
 
-                <h3>
+}}
 
-                  {t.title}
+>
 
-                </h3>
+<h3>
 
-                <p>
+{
+t.title
+}
 
-                  Priority:
-                  {' '}
-                  {t.priority}
+</h3>
 
-                </p>
+<p>
 
-                <p>
+Priority:
 
-                  Status:
-                  {' '}
-                  {t.status}
+{
+t.priority
+}
 
-                </p>
+</p>
 
-              </div>
+<p>
 
-            )
+Status:
 
-          )
+{
+t.status
+}
 
-      }
+</p>
 
-    </div>
+</div>
 
-  )
+)
+
+}
+
+</div>
+
+)
 
 }
 

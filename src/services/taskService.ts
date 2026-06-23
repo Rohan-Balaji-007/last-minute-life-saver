@@ -18,19 +18,27 @@ return data
 }
 
 export async function addTask(
-title:string
+task:any
 ){
 
 await supabase
-.from('tasks')
+
+.from(
+'tasks'
+)
+
 .insert([
+
 {
 
-title:title,
+title:
+task.title,
 
-status:'pending',
+priority:
+task.priority,
 
-priority:5
+status:
+task.status
 
 }
 

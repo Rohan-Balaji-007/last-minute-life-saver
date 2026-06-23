@@ -5,9 +5,9 @@ import {
 from 'react'
 
 import {
-  parseTask
+plannerAgent
 }
-from './services/gemini'
+from './services/plannerAgent'
 
 import {
   getTasks,
@@ -48,30 +48,34 @@ function App() {
 
   async function run() {
 
-    if (
-      !input.trim()
-    )
-      return
+if(
+!input.trim()
+)
+return
 
-    const parsed =
-      await parseTask(
-        input
-      )
+const agent=
 
-    console.log(
-      parsed
-    )
+await plannerAgent(
+input
+)
 
-    await addTask(
-      parsed
-    )
+console.log(
+agent
+)
 
-    setInput('')
+await addTask(
 
-    await load()
+agent.tasks[0]
 
-  }
+)
 
+setInput(
+''
+)
+
+await load()
+
+}
   return (
 
     <div
@@ -143,7 +147,58 @@ marginBottom:'30px'
 }}
 
 >
+{
 
+tasks.length>0
+
+&&
+
+<div
+
+style={{
+
+padding:'15px',
+
+background:'#eef7ff',
+
+borderRadius:'10px',
+
+marginBottom:'20px'
+
+}}
+
+>
+
+<h3>
+
+🧠 AI Recommendation
+
+</h3>
+
+<p>
+
+{
+
+tasks.some(
+(t:any)=>
+t.priority>=8
+)
+
+?
+
+'⚠ Start immediately. Delay lower value work.'
+
+:
+
+'You have time. Maintain momentum.'
+
+}
+
+</p>
+
+</div>
+
+}
 <h2>
 
 🧠 AI Dashboard

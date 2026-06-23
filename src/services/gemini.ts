@@ -20,16 +20,11 @@ const response=
 await ai.models.generateContent({
 
 model:
-"gemini-2.5-flash-lite",
+"gemini-2.5-flash",
 
 contents:
 `
 Return ONLY JSON.
-
-No markdown.
-No explanation.
-
-Extract task.
 
 Input:
 ${input}
@@ -38,15 +33,12 @@ Output:
 
 {
 "title":"",
-
 "priority":0,
-
 "status":"pending",
 
 "schedule":{
 
 "start_time":"",
-
 "end_time":""
 
 }
@@ -56,45 +48,19 @@ Output:
 Rules:
 
 priority:
-1–3 = low
-
-4–7 = medium
-
-8–10 = urgent
+1–10
 
 Never return 0.
 
 status:
 always pending.
-
-If task contains a deadline:
-
-create realistic schedule.
-
-Prefer:
-
-60–90 minute blocks.
-
-If no deadline:
-
-return empty schedule.
 `
 
 })
 
-if(
-!response.text
-){
-
-throw new Error(
-'Empty response'
-)
-
-}
-
 const clean=
 
-response.text
+(response.text||'')
 
 .replace(
 /```json/g,
@@ -103,21 +69,62 @@ response.text
 
 .replace(
 /```/g,
-''
-)
+'')
 
 .trim()
 
-return JSON.parse(
-clean
+if(
+!clean
+){
+
+throw new Error(
+'empty'
 )
 
 }
 
-catch(error){
+const parsed=
 
-console.log(
-error
+JSON.parse(
+clean
+)
+
+if(
+!parsed.priority
+){
+
+parsed.priority=5
+
+}
+
+return parsed
+
+}
+
+catch{
+
+const urgent=
+
+input
+.toLowerCase()
+.includes(
+'interview'
+)
+
+||
+
+input
+.toLowerCase()
+.includes(
+'exam'
+)
+
+||
+
+input
+.toLowerCase()
+.includes(
+'tomorrow'
 )
 
 return{
@@ -126,6 +133,15 @@ title:
 input,
 
 priority:
+
+urgent
+
+?
+
+9
+
+:
+
 5,
 
 status:
@@ -133,9 +149,29 @@ status:
 
 schedule:{
 
-start_time:'',
+start_time:
 
-end_time:''
+urgent
+
+?
+
+'Today 6 PM'
+
+:
+
+'Tomorrow 7 PM',
+
+end_time:
+
+urgent
+
+?
+
+'Today 8 PM'
+
+:
+
+'Tomorrow 8 PM'
 
 }
 

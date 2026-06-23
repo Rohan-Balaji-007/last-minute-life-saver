@@ -1,73 +1,52 @@
-# React + TypeScript + Vite
+# Last Minute Life Saver
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+AI-powered productivity companion built for CodeNinjas × Google for Developers Vibe2Ship Hackathon.
 
-Currently, two official plugins are available:
+## Problem
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+People miss assignments, interviews, deadlines, meetings, and important commitments because reminders alone do not help them take action.
 
-## React Compiler
+## Solution
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Last Minute Life Saver converts natural-language tasks into actionable plans using AI.
 
-## Expanding the ESLint configuration
+Example:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Input:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Prepare interview tomorrow and submit DBMS assignment Friday.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Output:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+* Extract tasks
+* Prioritize work
+* Suggest execution schedule
+* Generate productivity insights
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Current Status
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Day 1 Completed ✅
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Features:
+
+* React frontend
+* Supabase integration
+* Task creation
+* Database persistence
+* Task display
+
+## Tech Stack
+
+* React
+* TypeScript
+* Supabase
+* Gemini
+* Google AI Studio
+
+## Next Milestones
+
+* Day 2 → AI Integration
+* Day 3 → Scheduling
+* Day 4 → Dashboard
+* Day 5 → Polish
+* Day 6 → Deploy

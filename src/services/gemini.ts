@@ -1,7 +1,14 @@
-import { GoogleGenAI }
+import {
+GoogleGenAI
+}
 from "@google/genai"
 
-const ai =
+import {
+agentPrompt
+}
+from '../prompts/agentPrompt'
+
+const ai=
 new GoogleGenAI({
 
 apiKey:
@@ -20,40 +27,17 @@ const response=
 await ai.models.generateContent({
 
 model:
-"gemini-2.5-flash",
+'gemini-2.5-flash',
 
 contents:
 `
-Return ONLY JSON.
 
-Input:
+${agentPrompt}
+
+User:
+
 ${input}
 
-Output:
-
-{
-"title":"",
-"priority":0,
-"status":"pending",
-
-"schedule":{
-
-"start_time":"",
-"end_time":""
-
-}
-
-}
-
-Rules:
-
-priority:
-1–10
-
-Never return 0.
-
-status:
-always pending.
 `
 
 })
@@ -69,7 +53,8 @@ const clean=
 
 .replace(
 /```/g,
-'')
+''
+)
 
 .trim()
 
@@ -77,9 +62,7 @@ if(
 !clean
 ){
 
-throw new Error(
-'empty'
-)
+throw new Error()
 
 }
 
@@ -89,43 +72,78 @@ JSON.parse(
 clean
 )
 
-if(
-!parsed.priority
-){
+return{
 
-parsed.priority=5
+title:
+
+parsed.title
+
+||
+
+input,
+
+priority:
+
+Math.max(
+1,
+
+Math.min(
+10,
+
+parsed.priority
+||
+5
+
+)
+
+),
+
+urgency:
+
+parsed.urgency
+
+||
+
+'medium',
+
+rescue_mode:
+
+parsed.rescue_mode
+
+??
+
+false,
+
+reason:
+
+parsed.reason
+
+||
+
+'AI analyzed task.',
+
+status:
+
+'pending',
+
+schedule:
+
+parsed.schedule
+
+||
+
+{
+
+start_time:'',
+end_time:''
 
 }
 
-return parsed
+}
 
 }
 
 catch{
-
-const urgent=
-
-input
-.toLowerCase()
-.includes(
-'interview'
-)
-
-||
-
-input
-.toLowerCase()
-.includes(
-'exam'
-)
-
-||
-
-input
-.toLowerCase()
-.includes(
-'tomorrow'
-)
 
 return{
 
@@ -133,45 +151,25 @@ title:
 input,
 
 priority:
-
-urgent
-
-?
-
-9
-
-:
-
 5,
+
+urgency:
+'medium',
+
+rescue_mode:
+false,
+
+reason:
+'Fallback analysis.',
 
 status:
 'pending',
 
 schedule:{
 
-start_time:
+start_time:'',
 
-urgent
-
-?
-
-'Today 6 PM'
-
-:
-
-'Tomorrow 7 PM',
-
-end_time:
-
-urgent
-
-?
-
-'Today 8 PM'
-
-:
-
-'Tomorrow 8 PM'
+end_time:''
 
 }
 

@@ -1,215 +1,115 @@
-import {
-  useState,
-  useEffect
-}
-from 'react'
+import { useState, useEffect } from 'react'
+
+import { runAgent } from './services/agentService'
 
 import {
-plannerAgent
-}
-from './services/plannerAgent'
-
-import {
-  getTasks,
-  addTask
+getTasks,
+addTask,
+deleteTask
 }
 from './services/taskService'
 
-function App() {
+function App(){
 
-  const [
-    input,
-    setInput
-  ] =
-  useState('')
+const [input,setInput]=
+useState('')
 
-  const [
-    tasks,
-    setTasks
-  ] =
-  useState<any[]>([])
+const [tasks,setTasks]=
+useState<any[]>([])
 
-  async function load() {
+const [deletingId,setDeletingId]=
+useState<string|null>(null)
 
-    const data =
-      await getTasks()
+const [loading,setLoading]=
+useState(false)
 
-    setTasks(
-      data || []
-    )
+async function load(){
 
-  }
+const data=
 
-  useEffect(() => {
+await getTasks()
 
-    load()
+setTasks(
+data||[]
+)
 
-  }, [])
+}
 
-  async function run() {
+useEffect(()=>{
+
+load()
+
+},[])
+
+async function run(){
 
 if(
 !input.trim()
 )
 return
 
-const agent=
-
-await plannerAgent(
-input
+setLoading(
+true
 )
 
-console.log(
-agent
+try{
+
+const result=
+
+await runAgent(
+input,
+tasks
 )
 
 await addTask(
-
-agent.tasks[0]
-
+result.task
 )
 
-setInput(
-''
-)
+setInput('')
 
 await load()
 
 }
-  return (
 
-    <div
-      style={{
-        padding: '40px',
-        maxWidth: '700px',
-        margin: 'auto'
-      }}
-    >
+finally{
 
-      <h1>
+setLoading(
+false
+)
 
-         Last Minute Life Saver
+}
 
-      </h1>
+}
 
-      <br />
+async function remove(
+id:string
+){
 
-      <input
+setDeletingId(
+id
+)
 
-        value={input}
+await deleteTask(
+id
+)
 
-        placeholder="Type task..."
+await load()
 
-        onChange={
-          e =>
-            setInput(
-              e.target.value
-            )
-        }
+setDeletingId(
+null
+)
 
-        style={{
-          padding: '10px',
-          width: '70%'
-        }}
+}
 
-      />
-
-      <button
-
-        onClick={run}
-
-        style={{
-          marginLeft: '10px',
-          padding: '10px'
-        }}
-
-      >
-
-        Generate
-
-      </button>
-
-      <br />
-      <br />
-      
-      <div
-
-style={{
-
-padding:'20px',
-
-border:'2px solid #ddd',
-
-borderRadius:'12px',
-
-marginBottom:'30px'
-
-}}
-
->
-{
-
-tasks.length>0
-
-&&
-
-<div
-
-style={{
-
-padding:'15px',
-
-background:'#eef7ff',
-
-borderRadius:'10px',
-
-marginBottom:'20px'
-
-}}
-
->
-
-<h3>
-
-🧠 AI Recommendation
-
-</h3>
-
-<p>
-
-{
+const urgent=
 
 tasks.some(
 (t:any)=>
 t.priority>=8
 )
 
-?
+const nextTask=
 
-'⚠ Start immediately. Delay lower value work.'
-
-:
-
-'You have time. Maintain momentum.'
-
-}
-
-</p>
-
-</div>
-
-}
-<h2>
-
-🧠 AI Dashboard
-
-</h2>
-
-<p>
-
-Next Action:
-
-{
 tasks.length
 
 ?
@@ -217,8 +117,10 @@ tasks.length
 [...tasks]
 
 .sort(
-(a,b)=>
+(a:any,b:any)=>
+
 b.priority-a.priority
+
 )
 
 [0]
@@ -228,20 +130,168 @@ b.priority-a.priority
 :
 
 'No tasks yet'
+
+return(
+
+<div
+
+style={{
+
+padding:'40px',
+
+maxWidth:'760px',
+
+margin:'auto'
+
+}}
+
+>
+
+<h1>
+
+🧠 Last Minute Life Saver
+
+<span
+
+style={{
+
+fontSize:'14px',
+
+marginLeft:'12px',
+
+padding:'5px 10px',
+
+background:'#eef7ff',
+
+borderRadius:'20px'
+
+}}
+
+>
+
+AI MODE
+
+</span>
+
+</h1>
+
+<p>
+
+AI that turns panic into action
+
+</p>
+
+<br/>
+
+<input
+
+value={input}
+
+placeholder='Type task...'
+
+onChange={
+e=>
+
+setInput(
+e.target.value
+)
+
+}
+
+style={{
+
+padding:'12px',
+
+width:'70%',
+
+borderRadius:'10px'
+
+}}
+
+/>
+
+<button
+
+onClick={run}
+
+disabled={loading}
+
+style={{
+
+marginLeft:'10px',
+
+padding:'12px',
+
+borderRadius:'10px'
+
+}}
+
+>
+
+{
+
+loading
+
+?
+
+'🧠 Thinking...'
+
+:
+
+'Generate'
+
+}
+
+</button>
+
+<br/>
+<br/>
+
+<div
+
+style={{
+
+padding:'20px',
+
+border:'2px solid #ddd',
+
+borderRadius:'14px',
+
+marginBottom:'30px'
+
+}}
+
+>
+
+<h2>
+
+🧠 AI Dashboard
+
+</h2>
+
+<p>
+
+<b>
+
+Next Action
+
+</b>
+
+<br/>
+
+{
+nextTask
 }
 
 </p>
 
-<p>
+<br/>
 
-Today's Focus:
+<p>
 
 {
 
-tasks.some(
-(t:any)=>
-t.priority>=8
-)
+urgent
 
 ?
 
@@ -255,136 +305,224 @@ t.priority>=8
 
 </p>
 
-<p>
+</div>
 
-AI Suggestion:
+<h2>
+
+Tasks
+
+</h2>
 
 {
 
-tasks.some(
-(t:any)=>
-t.priority>=8
-)
+tasks.length===0
 
 ?
 
-'Start your highest priority task now.'
+<div>
+
+✨ No tasks yet
+
+</div>
 
 :
 
-'You have time. Build momentum.'
+tasks.map(
+
+(t:any)=>(
+
+<div
+
+key={
+t.id
+}
+
+style={{
+
+padding:'16px',
+
+border:'1px solid #ddd',
+
+borderRadius:'12px',
+
+marginBottom:'16px'
+
+}}
+
+>
+
+<h3>
+
+{
+t.title
+}
+
+</h3>
+
+<p>
+
+Priority:
+{' '}
+
+{
+t.priority
+}
+
+</p>
+
+<p>
+
+Status:
+{' '}
+
+{
+t.status
+}
+
+</p>
+
+{
+
+t.schedule
+
+&&
+
+<>
+
+<p>
+
+🕒 Suggested Time:
+{' '}
+
+{
+
+t.schedule?.start_time
+
+||
+
+'AI deciding'
 
 }
 
 </p>
 
+{
+
+t.schedule?.reason
+
+&&
+
+<p>
+
+🧠
+
+{
+t.schedule.reason
+}
+
+</p>
+
+}
+
+</>
+
+}
+
+{
+
+t.priority>=8
+
+&&
+
+<div
+
+style={{
+
+padding:'10px',
+
+background:'#fff4e5',
+
+borderRadius:'8px'
+
+}}
+
+>
+
+⚠ Rescue Mode
+
 </div>
-      <h2>
-        
-        Tasks
 
-      </h2>
+}
 
-      {
+<button
 
-        tasks.map(
+onClick={()=>
 
-          t => (
+remove(
+t.id
+)
 
-            <div
+}
 
-              key={
-                t.id
-              }
+disabled={
+deletingId===t.id
+}
 
-              style={{
+style={{
 
-                padding: '15px',
+marginTop:'10px',
 
-                border:
-                  '1px solid gray',
+padding:'10px',
 
-                marginBottom:
-                  '15px',
+border:'none',
 
-                borderRadius:
-                  '10px'
+borderRadius:'10px',
 
-              }}
+background:
 
-            >
+deletingId===t.id
 
-              <h3>
+?
 
-                {
-                  t.title
-                }
+'#777'
 
-              </h3>
+:
 
-              <p>
+'#111',
 
-                Priority:
-                {' '}
-                {
-                  t.priority
-                }
+color:'white'
 
-              </p>
+}}
 
-              <p>
+>
 
-                Status:
-                {' '}
-                {
-                  t.status
-                }
+{
 
-              </p>
+deletingId===t.id
 
-              {
+?
 
-                t.priority >= 8
+'⏳ Removing...'
 
-                &&
+:
 
-                <div
+'🗑 Remove'
 
-                  style={{
+}
 
-                    marginTop: '10px',
+</button>
 
-                    padding: '10px',
+</div>
 
-                    background: '#fff4e5',
+)
 
-                    borderRadius: '8px'
+)
 
-                  }}
+}
 
-                >
+</div>
 
-                  ⚠ Rescue Mode Activated
-
-                  <br />
-
-                  Focus on this before lower priority tasks.
-
-                </div>
-
-              }
-
-            </div>
-
-          )
-
-        )
-
-      }
-
-    </div>
-
-  )
+)
 
 }
 

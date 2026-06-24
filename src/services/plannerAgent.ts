@@ -20,7 +20,20 @@ task.priority>=8
 return{
 
 tasks:[
-task
+
+{
+
+title:
+task.title,
+
+priority:
+task.priority,
+
+status:
+task.status
+
+}
+
 ],
 
 schedule:[
@@ -63,7 +76,7 @@ urgent
 
 ?
 
-'Start immediately. Delay low priority work.'
+'Start immediately.'
 
 :
 
